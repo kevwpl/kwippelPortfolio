@@ -18,8 +18,8 @@
 <main class:dark-theme={darkMode} class="flex items-center justify-center min-h-screen room-background">
     <div class="top-container">
         <button type="button" class="dark-mode-toggle nav-link" on:click={toggleDarkMode}>
-            {#if darkMode}☀ Light{/if}
-            {#if !darkMode}🌙 Dark{/if}
+            {#if darkMode}Light{/if}
+            {#if !darkMode}Dark{/if}
         </button>
     </div>
 
