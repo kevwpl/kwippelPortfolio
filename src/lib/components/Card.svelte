@@ -17,7 +17,6 @@
     const AUTO_SPIN_ACCELERATION = 0.0005;
     const MOUSE_PROXIMITY_THRESHOLD = 300;
     const scale = tweened(1, { duration: 150, easing: cubicOut });
-
     let cardContainer;
 
     function handleMouseDown(event) {
@@ -27,32 +26,41 @@
         clearTimeout(autoSpinTimeoutId);
     }
 
+    function handleTouchStart(event) {
+        if (event.touches.length === 1) {
+            isDragging = true;
+            startX = event.touches[0].clientX;
+            cancelAnimationFrame(animationFrameId);
+            clearTimeout(autoSpinTimeoutId);
+        }
+    }
+
     function handleMouseUp() {
         isDragging = false;
         applyFriction();
         setAutoSpinTimeout();
     }
 
+    function handleTouchEnd() {
+        isDragging = false;
+        applyFriction();
+        setAutoSpinTimeout();
+    }
+
     function handleMouseMove(event) {
-        if (!cardContainer) return;
+        if (!isDragging) return;
+        const deltaX = event.clientX - startX;
+        velocity = deltaX * DRAG_INTENSITY;
+        angle += velocity;
+        startX = event.clientX;
+    }
 
-        const cardRect = cardContainer.getBoundingClientRect();
-        const cardCenterX = cardRect.left + cardRect.width / 2;
-        const cardCenterY = cardRect.top + cardRect.height / 2;
-        const distance = Math.sqrt(Math.pow(event.clientX - cardCenterX, 2) + Math.pow(event.clientY - cardCenterY, 2));
-
-        if (distance < MOUSE_PROXIMITY_THRESHOLD) {
-            scale.set(1.1);
-        } else {
-            scale.set(1);
-        }
-
-        if (isDragging) {
-            const deltaX = event.clientX - startX;
-            velocity = deltaX * DRAG_INTENSITY;
-            angle += velocity;
-            startX = event.clientX;
-        }
+    function handleTouchMove(event) {
+        if (!isDragging || event.touches.length !== 1) return;
+        const deltaX = event.touches[0].clientX - startX;
+        velocity = deltaX * DRAG_INTENSITY;
+        angle += velocity;
+        startX = event.touches[0].clientX;
     }
 
     function applyFriction() {
@@ -85,8 +93,11 @@
     onMount(() => {
         if (cardContainer) {
             cardContainer.addEventListener('mousedown', handleMouseDown);
+            cardContainer.addEventListener('touchstart', handleTouchStart, {passive: true});
             window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('touchmove', handleTouchMove, {passive: true});
             window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener('touchend', handleTouchEnd);
             setAutoSpinTimeout();
         }
     });
@@ -94,8 +105,11 @@
     onDestroy(() => {
         if (cardContainer) {
             cardContainer.removeEventListener('mousedown', handleMouseDown);
+            cardContainer.removeEventListener('touchstart', handleTouchStart);
             window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('touchend', handleTouchEnd);
             clearTimeout(autoSpinTimeoutId);
             cancelAnimationFrame(animationFrameId);
         }
