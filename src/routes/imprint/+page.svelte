@@ -1,4 +1,9 @@
 <!-- src/routes/imprint/+page.svelte -->
+
+<svelte:head>
+    <title>Kevin Wippel – Imprint</title>
+</svelte:head>
+
 <main>
     <div class="max-w-md w-full space-y-6 p-8">
         <h1 class="text-2xl font-bold text-gray-800">Impressum</h1>
