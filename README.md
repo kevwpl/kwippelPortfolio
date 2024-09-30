@@ -1,4 +1,4 @@
 # My Website
 
-[Click Here!](https://kwippel.at).
+[Click Here!](https://kwippel.at)
 
